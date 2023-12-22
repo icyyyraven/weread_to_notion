@@ -171,7 +171,7 @@ def get_chapter_info(bookId):
 
 
 def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
-    # properties中删除不需要的sort
+    # properties中删除不需要的sort, 增加categories
     """插入到notion"""
     time.sleep(0.3)
     parent = {
@@ -187,7 +187,7 @@ def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
         "Rating": {"number": rating},
         "Cover": {"files": [{"type": "external", "name": "Cover", "external": {"url": cover}}]},
     }
-    #不显示URL，新增categories
+    #新增categories
     if(categories!=None):
         multi_select = [{"name": x} for x in categories]
         properties["Categories"] = {"multi_select":multi_select}
@@ -287,7 +287,7 @@ def get_children(chapter, summary, bookmark_list):
                 children.append(get_heading(
                     chapter.get(key).get("level"), chapter.get(key).get("title")))
             for i in value: 
-                # 这里暂时没有更新最新版
+                # 简化color和style相关变量
                 markText = i.get("markText")
                 for j in range(0, len(markText)//2000+1):
                     children.append(get_callout(markText[j*2000:(j+1)*2000], i.get("reviewId")))
@@ -298,6 +298,7 @@ def get_children(chapter, summary, bookmark_list):
     else:
         # 如果没有章节信息
         for data in bookmark_list:
+            # 简化color和style相关变量
             markText = data.get("markText")
             for i in range(0, len(markText)//2000+1):
                 children.append(get_callout(markText[i*2000:(i+1)*2000], data.get("reviewId")))
@@ -311,17 +312,16 @@ def get_children(chapter, summary, bookmark_list):
 
 def transform_id(book_id):
     id_length = len(book_id)
-
     if re.match("^\d*$", book_id):
         ary = []
         for i in range(0, id_length, 9):
             ary.append(format(int(book_id[i:min(i + 9, id_length)]), 'x'))
         return '3', ary
-
     result = ''
     for i in range(id_length):
         result += format(ord(book_id[i]), 'x')
     return '4', [result]
+    # 此处简化封面目录创建
 
 def calculate_book_str_id(book_id):
     md5 = hashlib.md5()
@@ -387,9 +387,10 @@ if __name__ == "__main__":
             categories = book.get("categories")
             if(categories!=None):
                 categories = [x["title"] for x in categories]
+            print(f"正在同步 {title} ,一共{len(books)}本，当前是第{i}本。")
             check(bookId)
             isbn,rating = get_bookinfo(bookId)
-            id = insert_to_notion(title, bookId, cover, sort, author,isbn,rating)
+            id = insert_to_notion(title, bookId, cover, author, isbn, rating, categories)
             chapter = get_chapter_info(bookId)
             bookmark_list = get_bookmark_list(bookId)
             summary, reviews = get_review_list(bookId)
