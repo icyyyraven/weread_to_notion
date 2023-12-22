@@ -297,14 +297,21 @@ def get_children(chapter, summary, bookmark_list):
     else:
         # 如果没有章节信息
         for data in bookmark_list:
-            children.append(get_callout(data.get("markText"),
-                            data.get("style"), data.get("colorStyle"), data.get("reviewId")))
+            if(data.get("reviewId")==None and "style" in data and "colorStyle" in data):
+                if(data.get("style") not in styles):
+                    continue
+                if(data.get("colorStyle") not in colors):
+                    continue
+            markText = data.get("markText")
+            for i in range(0, len(markText)//2000+1):
+                children.append(get_callout(markText[i*2000:(i+1)*2000],
+                                data.get("style"), data.get("colorStyle"), data.get("reviewId")))
     if summary != None and len(summary) > 0:
         children.append(get_heading(1, "点评"))
         for i in summary:
             content = i.get("review").get("content")
             for j in range(0, len(content)//2000+1):
-                children.append(get_callout(i.get("review").get("content"), i.get(
+                children.append(get_callout(content[j*2000:(j+1)*2000], i.get(
                     "style"), i.get("colorStyle"), i.get("review").get("reviewId")))
     return children, grandchild
 
@@ -381,7 +388,6 @@ if __name__ == "__main__":
             categories = book.get("categories")
             if(categories!=None):
                 categories = [x["title"] for x in categories]
-            print(f"正在同步 {title} ,一共{len(books)}本。")
             check(bookId)
             isbn,rating = get_bookinfo(bookId)
             id = insert_to_notion(title, bookId, cover, sort, author,isbn,rating)
