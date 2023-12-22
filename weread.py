@@ -286,9 +286,9 @@ def get_children(chapter, summary, bookmark_list):
                     chapter.get(key).get("level"), chapter.get(key).get("title")))
             for i in value: 
                 # 这里暂时没有更新最新版
-                callout = get_callout(
-                    i.get("markText"), data.get("style"), i.get("colorStyle"), i.get("reviewId"))
-                children.append(callout)
+                markText = i.get("markText")
+                for j in range(0, len(markText)//2000+1):
+                    children.append(get_callout(markText[j*2000:(j+1)*2000], i.get("reviewId")))
                 if i.get("abstract") != None and i.get("abstract") != "":
                     quote = get_quote(i.get("abstract"))
                     grandchild[len(children)-1] = quote
@@ -296,22 +296,15 @@ def get_children(chapter, summary, bookmark_list):
     else:
         # 如果没有章节信息
         for data in bookmark_list:
-            if(data.get("reviewId")==None and "style" in data and "colorStyle" in data):
-                if(data.get("style") not in styles):
-                    continue
-                if(data.get("colorStyle") not in colors):
-                    continue
             markText = data.get("markText")
             for i in range(0, len(markText)//2000+1):
-                children.append(get_callout(markText[i*2000:(i+1)*2000],
-                                data.get("style"), data.get("colorStyle"), data.get("reviewId")))
+                children.append(get_callout(markText[i*2000:(i+1)*2000], data.get("reviewId")))
     if summary != None and len(summary) > 0:
         children.append(get_heading(1, "点评"))
         for i in summary:
             content = i.get("review").get("content")
             for j in range(0, len(content)//2000+1):
-                children.append(get_callout(content[j*2000:(j+1)*2000], i.get(
-                    "style"), i.get("colorStyle"), i.get("review").get("reviewId")))
+                children.append(get_callout(content[j*2000:(j+1)*2000], i.get("review").get("reviewId")))
     return children, grandchild
 
 def transform_id(book_id):
@@ -361,8 +354,6 @@ if __name__ == "__main__":
     parser.add_argument("database_id")
     parser.add_argument("ref")
     parser.add_argument("repository")
-    parser.add_argument("--styles",nargs="+",type=int,help="划线样式")
-    parser.add_argument("--colors",nargs="+",type=int,help="划线颜色")
     options = parser.parse_args()
     weread_cookie = options.weread_cookie
     database_id = options.database_id
@@ -370,8 +361,6 @@ if __name__ == "__main__":
     ref = options.ref
     branch = ref.split('/')[-1]
     repository = options.repository
-    styles = options.styles
-    colors = options.colors
     session = requests.Session()
     session.cookies = parse_cookie_string(weread_cookie)
     client = Client(
