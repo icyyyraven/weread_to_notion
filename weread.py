@@ -302,8 +302,10 @@ def get_children(chapter, summary, bookmark_list):
     if summary != None and len(summary) > 0:
         children.append(get_heading(1, "点评"))
         for i in summary:
-            children.append(get_callout(i.get("review").get("content"), i.get(
-                "style"), i.get("colorStyle"), i.get("review").get("reviewId")))
+            content = i.get("review").get("content")
+            for j in range(0, len(content)//2000+1):
+                children.append(get_callout(i.get("review").get("content"), i.get(
+                    "style"), i.get("colorStyle"), i.get("review").get("reviewId")))
     return children, grandchild
 
 def transform_id(book_id):
@@ -364,8 +366,10 @@ if __name__ == "__main__":
     session.get(WEREAD_URL)
     latest_sort = get_sort()
     books = get_notebooklist()
+    i = 0
     if (books != None):
         for book in books:
+            i +=1
             sort = book["sort"]
             if sort <= latest_sort:
                 continue
