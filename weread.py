@@ -285,11 +285,15 @@ def get_children(chapter, summary, bookmark_list):
                 # 添加章节
                 children.append(get_heading(
                     chapter.get(key).get("level"), chapter.get(key).get("title")))
-            for i in value: 
-                # 这里暂时没有更新最新版
-                callout = get_callout(
-                    i.get("markText"), data.get("style"), i.get("colorStyle"), i.get("reviewId"))
-                children.append(callout)
+            for i in value:
+                if(data.get("reviewId")==None and "style" in i and "colorStyle" in i):
+                    if(i.get("style") not in styles):
+                        continue
+                    if(i.get("colorStyle") not in colors):
+                        continue
+                markText = i.get("markText")
+                for j in range(0, len(markText)//2000+1):
+                    children.append(get_callout(markText[j*2000:(j+1)*2000],i.get("style"), i.get("colorStyle"), i.get("reviewId")))
                 if i.get("abstract") != None and i.get("abstract") != "":
                     quote = get_quote(i.get("abstract"))
                     grandchild[len(children)-1] = quote
