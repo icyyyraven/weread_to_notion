@@ -121,7 +121,7 @@ def get_quote(content):
     }
 
 
-def get_callout(content, style, colorStyle, reviewId):
+def get_callout(content, reviewId):
     # 简化笔记呈现方式
     color = "default"
     if reviewId != None:
