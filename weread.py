@@ -207,8 +207,7 @@ def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
         properties["ReadingTime"] = {"rich_text": [
             {"type": "text", "text": {"content": format_time}}]}
         if "finishedDate" in read_info:
-            properties["EndDate"] = {"date": {"start": datetime.utcfromtimestamp(read_info.get(
-                "finishedDate")).strftime("%Y-%m-%d %H:%M:%S"), "time_zone": "Asia/Shanghai"}}
+            properties["EndDate"] = {"date": {"start": datetime.utcfromtimestamp(read_info.get("finishedDate")).strftime("%Y-%m-%d %H:%M:%S"), "time_zone": "Asia/Shanghai"}}
 
     icon = {"type": "emoji","emoji": "📖"}
     #icon简化，不使用书本封面
@@ -285,15 +284,11 @@ def get_children(chapter, summary, bookmark_list):
                 # 添加章节
                 children.append(get_heading(
                     chapter.get(key).get("level"), chapter.get(key).get("title")))
-            for i in value:
-                if(data.get("reviewId")==None and "style" in i and "colorStyle" in i):
-                    if(i.get("style") not in styles):
-                        continue
-                    if(i.get("colorStyle") not in colors):
-                        continue
-                markText = i.get("markText")
-                for j in range(0, len(markText)//2000+1):
-                    children.append(get_callout(markText[j*2000:(j+1)*2000],i.get("style"), i.get("colorStyle"), i.get("reviewId")))
+            for i in value: 
+                # 这里暂时没有更新最新版
+                callout = get_callout(
+                    i.get("markText"), data.get("style"), i.get("colorStyle"), i.get("reviewId"))
+                children.append(callout)
                 if i.get("abstract") != None and i.get("abstract") != "":
                     quote = get_quote(i.get("abstract"))
                     grandchild[len(children)-1] = quote
@@ -364,10 +359,19 @@ if __name__ == "__main__":
     parser.add_argument("weread_cookie")
     parser.add_argument("notion_token")
     parser.add_argument("database_id")
+    parser.add_argument("ref")
+    parser.add_argument("repository")
+    parser.add_argument("--styles",nargs="+",type=int,help="划线样式")
+    parser.add_argument("--colors",nargs="+",type=int,help="划线颜色")
     options = parser.parse_args()
     weread_cookie = options.weread_cookie
     database_id = options.database_id
     notion_token = options.notion_token
+    ref = options.ref
+    branch = ref.split('/')[-1]
+    repository = options.repository
+    styles = options.styles
+    colors = options.colors
     session = requests.Session()
     session.cookies = parse_cookie_string(weread_cookie)
     client = Client(
@@ -395,7 +399,6 @@ if __name__ == "__main__":
             check(bookId)
             isbn,rating = get_bookinfo(bookId)
             id = insert_to_notion(title, bookId, cover, sort, author,isbn,rating)
-            results = add_children(id, children)
             chapter = get_chapter_info(bookId)
             bookmark_list = get_bookmark_list(bookId)
             summary, reviews = get_review_list(bookId)
@@ -404,6 +407,6 @@ if __name__ == "__main__":
                 x.get("chapterUid", 1), 0 if (x.get("range", "") == "" or x.get("range").split("-")[0]=="" ) else int(x.get("range").split("-")[0])))
             children, grandchild = get_children(
                 chapter, summary, bookmark_list)
-            
+            results = add_children(id, children)
             if(len(grandchild)>0 and results!=None):
                 add_grandchild(grandchild, results)
