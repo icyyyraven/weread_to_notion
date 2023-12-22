@@ -123,12 +123,14 @@ def get_quote(content):
 
 def get_callout(content, reviewId):
     # 简化笔记呈现方式
+    emoji = "〰️"
     color = "default"
     if reviewId != None:
         color = "blue"
+    # 如果reviewId不是空说明是笔记
     return {
-        "type": "quote",
-        "quote": {
+        "type": "bulleted_list_item",
+        "bulleted_list_item": {
             "rich_text": [{
                 "type": "text",
                 "text": {
