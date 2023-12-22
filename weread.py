@@ -182,6 +182,7 @@ def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
         "BookName": {"title": [{"type": "text", "text": {"content": bookName}}]},
         "BookId": {"rich_text": [{"type": "text", "text": {"content": bookId}}]},
         "ISBN": {"rich_text": [{"type": "text", "text": {"content": isbn}}]},
+        "URL": {"url": f"https://weread.qq.com/web/reader/{calculate_book_str_id(bookId)}"},
         "Author": {"rich_text": [{"type": "text", "text": {"content": author}}]},
         "Rating": {"number": rating},
         "Cover": {"files": [{"type": "external", "name": "Cover", "external": {"url": cover}}]},
@@ -206,6 +207,7 @@ def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
             "name": "Finished" if markedStatus == 4 else "Reading"}}
         properties["ReadingTime"] = {"rich_text": [
             {"type": "text", "text": {"content": format_time}}]}
+        properties["Progress"] ={"number": readingProgress}
         if "finishedDate" in read_info:
             properties["EndDate"] = {"date": {"start": datetime.utcfromtimestamp(read_info.get("finishedDate")).strftime("%Y-%m-%d %H:%M:%S"), "time_zone": "Asia/Shanghai"}}
 
