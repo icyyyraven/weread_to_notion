@@ -25,7 +25,7 @@ jobs:
           python weread.py "${{secrets.WEREAD_COOKIE}}" "${{secrets.NOTION_TOKEN}}" "${{secrets.NOTION_DATABASE_ID}}"  "${{ github.ref }}" "${{ github.repository }}"
       - name: weread heatmap
         run: |
-          github_heatmap weread  --weread_cookie "${{secrets.WEREAD_COOKIE}}" --year 2018-2023 --me "${{secrets.NAME}}" --with-animation --background-color=#ffffff --track-color=#ACE7E7 --special-color1=#69B9C1 --special-color2=#54959F --dom-color=#EBEDF0 --text-color=#000000
+          github_heatmap weread  --weread_cookie "${{secrets.WEREAD_COOKIE}}" --year 2023 --me "${{secrets.NAME}}" --with-animation --background-color=#ffffff --track-color=#ACE7E7 --special-color1=#69B9C1 --special-color2=#54959F --dom-color=#EBEDF0 --text-color=#000000
       - name: push
         run: |
           git config --local user.email "action@github.com"
