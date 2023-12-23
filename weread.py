@@ -172,7 +172,7 @@ def get_chapter_info(bookId):
     return None
 
 
-def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
+def insert_to_notion(bookName, bookId, cover, sort, author, isbn, rating, categories):
     # properties中删除不需要的sort, 增加categories
     """插入到notion"""
     time.sleep(0.3)
@@ -184,6 +184,7 @@ def insert_to_notion(bookName, bookId, cover, author, isbn, rating, categories):
         "BookName": {"title": [{"type": "text", "text": {"content": bookName}}]},
         "BookId": {"rich_text": [{"type": "text", "text": {"content": bookId}}]},
         "ISBN": {"rich_text": [{"type": "text", "text": {"content": isbn}}]},
+        "Sort": {"number": sort},
         "URL": {"url": f"https://weread.qq.com/web/reader/{calculate_book_str_id(bookId)}"},
         "Author": {"rich_text": [{"type": "text", "text": {"content": author}}]},
         "Rating": {"number": rating},
@@ -392,7 +393,7 @@ if __name__ == "__main__":
             print(f"正在同步 {title} ,一共{len(books)}本，当前是第{i}本。")
             check(bookId)
             isbn,rating = get_bookinfo(bookId)
-            id = insert_to_notion(title, bookId, cover, author, isbn, rating, categories)
+            id = insert_to_notion(title, bookId, cover, sort, author, isbn, rating, categories)
             chapter = get_chapter_info(bookId)
             bookmark_list = get_bookmark_list(bookId)
             summary, reviews = get_review_list(bookId)
