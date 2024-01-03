@@ -173,7 +173,6 @@ def get_chapter_info(bookId):
 
 
 def insert_to_notion(bookName, bookId, cover, sort, author, isbn, rating, categories):
-    # properties中删除不需要的sort, 增加categories
     """插入到notion"""
     time.sleep(0.3)
     parent = {
@@ -181,7 +180,7 @@ def insert_to_notion(bookName, bookId, cover, sort, author, isbn, rating, catego
         "type": "database_id"
     }
     properties = {
-        "BookName": {"title": [{"type": "text", "text": {"content": bookName}}]},
+        "Book Name": {"title": [{"type": "text", "text": {"content": bookName}}]},
         "BookId": {"rich_text": [{"type": "text", "text": {"content": bookId}}]},
         "ISBN": {"rich_text": [{"type": "text", "text": {"content": isbn}}]},
         "Sort": {"number": sort},
@@ -206,13 +205,13 @@ def insert_to_notion(bookName, bookId, cover, sort, author, isbn, rating, catego
         minutes = readingTime % 3600 // 60
         if minutes > 0:
             format_time += f"{minutes}min"
-        properties["Status"] = {"select": {
+        properties["Status"] = {"status": {
             "name": "Finished" if markedStatus == 4 else "Reading"}}
-        properties["ReadingTime"] = {"rich_text": [
+        properties["Reading Time"] = {"rich_text": [
             {"type": "text", "text": {"content": format_time}}]}
         properties["Progress"] ={"number": readingProgress}
         if "finishedDate" in read_info:
-            properties["EndDate"] = {"date": {"start": datetime.utcfromtimestamp(read_info.get("finishedDate")).strftime("%Y-%m-%d %H:%M:%S"), "time_zone": "Asia/Shanghai"}}
+            properties["End Date"] = {"date": {"start": datetime.utcfromtimestamp(read_info.get("finishedDate")).strftime("%Y-%m-%d %H:%M:%S"), "time_zone": "Asia/Shanghai"}}
 
     icon = {"type": "emoji","emoji": "📖"}
     #icon简化，不使用书本封面
